@@ -1,6 +1,7 @@
 # Electronic-Nursing-Record-Information-Extraction
+
 关系类型|Tag|Description|Example|
----|---|---|---|---|---|
+---|---|---|---|
 主谓关系|SBV|subject-verb|我送她一束花 (我 <-- 送)
 动宾关系|VOB|直接宾语，verb-object|我送她一束花 (送 --> 花)|
 间宾关系|IOB|间接宾语，indirect-object|我送她一束花 (送 --> 她)|
