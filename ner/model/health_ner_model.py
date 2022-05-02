@@ -28,6 +28,22 @@ class HealthNERModel(object):
                  max_grad_norm=10,
                  optimizer_name='adam'
                  ):
+        '''
+        params
+            label_dict: dict
+
+            tokenizers_parallelism: bool
+            learning_rate: float
+            train_per: float
+            max_len: int
+            num_workers: int
+            is_split: bool
+            epochs: int
+            train_batch_size: int
+            test_batch_size: int
+            max_grad_norm: int
+            optimizer_name: str; assert in ['adam', 'sgd']
+        '''
         self.label_dict = label_dict
         self.tokenizers_parallelism = tokenizers_parallelism
         self.learning_rate = learning_rate
@@ -49,19 +65,21 @@ class HealthNERModel(object):
             'ckiplab/bert-base-chinese', num_labels=len(label_dict))
         self.model.to(self.device)
 
-        self.build_dataset()
-        self.build_optimizer(optimizer_name)
-#         self.build_optimizer()
+        self._build_dataset()
+        self._build_optimizer(optimizer_name)
 
     def main(self):
+        '''
+        main function for train and test
+        '''
         wandb.watch(self.model)
 
         for e in range(1, self.epochs + 1):
             print('epochs:\t', e)
-            self.train(e)
-            self.test(e)
+            self._train(e)
+            self._test(e)
 
-    def train(self, epoch):
+    def _train(self, epoch):
         tr_loss, tr_accuracy = 0, 0
         nb_tr_examples, nb_tr_steps, notnan_steps = 0, 0, 0
         self.model.train()
@@ -114,7 +132,7 @@ class HealthNERModel(object):
         print(f"Training acc:  {tr_accuracy}")
         print(f"Training loss: {epoch_loss}")
 
-    def test(self, epoch):
+    def _test(self, epoch):
         ts_loss, ts_accuracy = 0, 0
         nb_ts_examples, nb_ts_steps, notnan_steps = 0, 0, 0
         self.model.eval()
@@ -155,7 +173,7 @@ class HealthNERModel(object):
         print(f"Testing acc:  {ts_accuracy}")
         print(f"Testing loss: {epoch_loss}")
 
-    def build_dataset(self):
+    def _build_dataset(self):
         train_set = NerCorpusDataset(
             self.tokenizer, '../input/chinese-healthner-corpus/train/train.json', self.label_dict, self.max_len)
         test_set = NerCorpusDataset(
@@ -176,7 +194,7 @@ class HealthNERModel(object):
         self.test_loader = DataLoader(
             test_set, batch_size=self.test_batch_size, shuffle=True, num_workers=self.num_workers)
 
-    def build_optimizer(self, optimizer):
+    def _build_optimizer(self, optimizer):
         assert optimizer in ['sgd', 'adam']
         if optimizer == "sgd":
             self.optimizer = torch.optim.SGD(params=self.model.parameters(),

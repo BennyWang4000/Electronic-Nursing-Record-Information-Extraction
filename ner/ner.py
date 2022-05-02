@@ -1,10 +1,14 @@
 # %%
-from .model.utils import ids_dict, label_dict
+import os
+import glob
+from ltp import LTP
+import sys
+if r'D:\CodeRepositories\aiot2022\Electronic-Nursing-Record-Information-Extraction\ner' not in sys.path:
+    sys.path.append(
+        r"D:\CodeRepositories\aiot2022\Electronic-Nursing-Record-Information-Extraction\ner")
+from model.utils import ids_dict, label_dict
 import torch
 from transformers import BertTokenizerFast
-import sys
-sys.path.append("ner")
-# %%
 
 
 class HealthNER:
@@ -48,20 +52,43 @@ class HealthNER:
         flattened_predictions = torch.argmax(active_logits, axis=1)
         flt_pre_np = flattened_predictions.cpu().numpy()
         labels = [ids_dict[label] for label in flt_pre_np]
-        labels = labels[1:sent_len]
+        labels = labels[1:sent_len + 1]
         return labels
+
+    def get_decoding(self, sentence: str) -> list:
+        encoding = self.tokenizer.encode(sentence, return_offsets_mapping=True,
+                                         padding='max_length',
+                                         truncation=True,
+                                         max_length=128,)
+        return self.tokenizer.decode(encoding[1:encoding.index(102)]).split(' ')
 
     def get_ne(self, sentence):
         '''get named entity
         params
+            sentence: str
+        return 
+            tuple<str, str, tuple<int, int>>
         '''
+        entities = []
         labels = self._get_model_output(sentence)
-        for label in labels:
-            if label:
-                pass
+        decoding = self.get_decoding(sentence)
 
-            # # %%
-            # n = HealthNER(
-            #     model_path='D:\\CodeRepositories\\aiot2022\\ie\\data\\models\\model_ner_adam_1e-06_2.pt')
-            # # %%
-            # print(n.get_ne(doc1))
+        isEntity = False
+        for i in range(len(labels)):
+            if labels[i][0] == 'B':
+                begin = i
+                isEntity = True
+            elif labels[i][0] == 'I':
+                end = i
+            elif isEntity:
+                entities.append(
+                    (''.join(decoding[begin:end + 1]), labels[begin][2:], (begin, end)))
+                isEntity = False
+
+        return entities
+
+        # # %%
+        # n = HealthNER(
+        #     model_path='D:\\CodeRepositories\\aiot2022\\ie\\data\\models\\model_ner_adam_1e-06_2.pt')
+        # # %%
+        # print(n.get_ne(doc1))

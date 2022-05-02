@@ -6,6 +6,9 @@ import numpy as np
 
 class NerCorpusDataset(Dataset):
     def __init__(self, tokenizer, data_path, label_dict, max_len=120):
+        '''
+
+        '''
         self.data = []
         with open(data_path) as f:
             for line in f:
@@ -13,6 +16,7 @@ class NerCorpusDataset(Dataset):
         self.len = len(self.data)
         self.max_len = max_len
         self.tokenizer = tokenizer
+        self.label_dict = label_dict
 
     def __getitem__(self, index):
         character = self.data[index]['character']
