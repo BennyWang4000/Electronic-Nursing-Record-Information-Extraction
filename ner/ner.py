@@ -67,7 +67,7 @@ class HealthNER:
         params
             sentence: str
         return 
-            tuple<str, str, tuple<int, int>>
+            list<dict<>>, {'word': str, 'type': str, 'pos': (int, int)}
         '''
         entities = []
         labels = self._get_model_output(sentence)
@@ -82,7 +82,9 @@ class HealthNER:
                 end = i
             elif isEntity:
                 entities.append(
-                    (''.join(decoding[begin:end + 1]), labels[begin][2:], (begin, end)))
+                    {'word': ''.join(
+                        decoding[begin:end + 1]), 'type': labels[begin][2:], 'pos': (begin, end)}
+                )
                 isEntity = False
 
         return entities
