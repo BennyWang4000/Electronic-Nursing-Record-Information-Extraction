@@ -5,7 +5,7 @@ doc3 = '腹部柔軟，聽診有腸蠕動音，灌食過程中暫無肺吸入情
 doc4 = '灌食過程中暫無肺吸入情形'
 
 stopwords_path = 'D:\\CodeRepositories\\aiot2022\\ie\\data\\stopwords.txt'
-nermodel_path = 'D:\\CodeRepositories\\aiot2022\\ie\\data\\models\\model_ner_adam_1e-06_2.pt'
+hnermodel_path = r'D:\CodeRepositories\aiot2022\data\models\model_ner_adam_1e-06_2.pt'
 alltext_dir = 'D:\\CodeRepositories\\aiot2022\\ie\\data\\all_text'
 alltext_dict = {'s': 'all_s.txt', 'o': 'all_o.txt',
                 'i': 'all_i.txt', 'e': 'all_e.txt', }

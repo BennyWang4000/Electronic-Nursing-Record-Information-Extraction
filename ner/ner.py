@@ -56,11 +56,38 @@ class HealthNER:
         return labels
 
     def get_decoding(self, sentence: str) -> list:
-        encoding = self.tokenizer.encode(sentence, return_offsets_mapping=True,
-                                         padding='max_length',
-                                         truncation=True,
-                                         max_length=128,)
-        return self.tokenizer.decode(encoding[1:encoding.index(102)]).split(' ')
+        '''get list of setence chunk. Devivde by sigle character and numbers
+        there's a [UNK] prob occured while encoding and decoding 
+
+        params
+            setence: str, sentence 
+
+        '''
+        decoding = []
+        isNumber = False
+        chunk = ''
+        for i in range(len(sentence)):
+            if sentence[i].isnumeric():
+                isNumber = True
+                chunk += sentence[i]
+            elif sentence[i] in ['.', ',']:
+                isNumber = False
+                chunk += sentence[i]
+                decoding.append(chunk)
+                chunk = ''
+            else:
+                if isNumber:
+                    isNumber = False
+                    decoding.append(chunk)
+                    chunk = ''
+                decoding.append(sentence[i])
+
+        return decoding
+        # encoding = self.tokenizer.encode(sentence, return_offsets_mapping=True,
+        #                                  padding='max_length',
+        #                                  truncation=True,
+        #                                  max_length=128,)
+        # decoding= self.tokenizer.decode(encoding[1:encoding.index(102)]).split(' ')
 
     def get_ne(self, sentence):
         '''get named entity
@@ -76,6 +103,12 @@ class HealthNER:
         isEntity = False
         for i in range(len(labels)):
             if labels[i][0] == 'B':
+                if isEntity:
+                    end = i - 1
+                    entities.append(
+                        {'word': ''.join(
+                            decoding[begin:end + 1]), 'type': labels[begin][2:], 'pos': (begin, end)}
+                    )
                 begin = i
                 isEntity = True
             elif labels[i][0] == 'I':
@@ -86,7 +119,6 @@ class HealthNER:
                         decoding[begin:end + 1]), 'type': labels[begin][2:], 'pos': (begin, end)}
                 )
                 isEntity = False
-
         return entities
 
         # # %%
@@ -94,3 +126,20 @@ class HealthNER:
         #     model_path='D:\\CodeRepositories\\aiot2022\\ie\\data\\models\\model_ner_adam_1e-06_2.pt')
         # # %%
         # print(n.get_ne(doc1))
+# %%
+hner = HealthNER(
+    r'D:\CodeRepositories\aiot2022\data\models\model_ner_adam_1e-06_2.pt')
+# %%
+sentence = '我媽媽查出有心臟病，還有早搏，醫生給他開了穩心顆粒和鹽酸美西律片，吃了以後就噁心，嘔吐，頭暈，手腳無力，還顫動，是怎麼回事，已經兩個多小時了，有危險嗎？，'
+sentence = '眼底病變：當微細動脈硬化會導致動脈內腔變細，動脈內壁變厚，使微細動脈出血，視神經乳頭浮腫，造成患者視力逐漸減低。但患者大多是再出現視力模糊後，接受眼科醫師檢查時，才發現罹患高血壓疾病。'
+# sentence = '懷孕53.天，有2.5次自然流產是不是正常'
+print(len(sentence))
+encoding = hner.tokenizer.encode(sentence, return_offsets_mapping=True,
+                                 padding='max_length',
+                                 truncation=True,
+                                 max_length=128,)
+print(encoding)
+print(hner.get_decoding(sentence))
+print(hner._get_model_output(sentence))
+print(hner.get_ne(sentence))
+# %%
