@@ -127,19 +127,19 @@ class HealthNER:
         # # %%
         # print(n.get_ne(doc1))
 # %%
-hner = HealthNER(
-    r'D:\CodeRepositories\aiot2022\data\models\model_ner_adam_1e-06_2.pt')
-# %%
-sentence = '我媽媽查出有心臟病，還有早搏，醫生給他開了穩心顆粒和鹽酸美西律片，吃了以後就噁心，嘔吐，頭暈，手腳無力，還顫動，是怎麼回事，已經兩個多小時了，有危險嗎？，'
-sentence = '眼底病變：當微細動脈硬化會導致動脈內腔變細，動脈內壁變厚，使微細動脈出血，視神經乳頭浮腫，造成患者視力逐漸減低。但患者大多是再出現視力模糊後，接受眼科醫師檢查時，才發現罹患高血壓疾病。'
-# sentence = '懷孕53.天，有2.5次自然流產是不是正常'
-print(len(sentence))
-encoding = hner.tokenizer.encode(sentence, return_offsets_mapping=True,
-                                 padding='max_length',
-                                 truncation=True,
-                                 max_length=128,)
-print(encoding)
-print(hner.get_decoding(sentence))
-print(hner._get_model_output(sentence))
-print(hner.get_ne(sentence))
-# %%
+# hner = HealthNER(
+#     r'D:\CodeRepositories\aiot2022\data\models\model_ner_adam_1e-06_2.pt')
+# # %%
+# sentence = '我媽媽查出有心臟病，還有早搏，醫生給他開了穩心顆粒和鹽酸美西律片，吃了以後就噁心，嘔吐，頭暈，手腳無力，還顫動，是怎麼回事，已經兩個多小時了，有危險嗎？，'
+# sentence = '眼底病變：當微細動脈硬化會導致動脈內腔變細，動脈內壁變厚，使微細動脈出血，視神經乳頭浮腫，造成患者視力逐漸減低。但患者大多是再出現視力模糊後，接受眼科醫師檢查時，才發現罹患高血壓疾病。'
+# # sentence = '懷孕53.天，有2.5次自然流產是不是正常'
+# print(len(sentence))
+# encoding = hner.tokenizer.encode(sentence, return_offsets_mapping=True,
+#                                  padding='max_length',
+#                                  truncation=True,
+#                                  max_length=128,)
+# print(encoding)
+# print(hner.get_decoding(sentence))
+# print(hner._get_model_output(sentence))
+# print(hner.get_ne(sentence))
+# # %%
