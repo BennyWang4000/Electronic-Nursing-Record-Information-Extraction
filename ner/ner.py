@@ -94,18 +94,24 @@ class HealthNER:
         decoding = self.tokenizer.decode(
             encoding[1:encoding.index(102)]).split(' ')
 
-        for unk_idx in unk_lst:
-            decoding[unk_idx] = encoding[unk_idx]
+        # for unk_idx in unk_lst:
+        #     decoding[unk_idx] = encoding[unk_idx]
+
+        # return decoding
+
+        count = 0
+        for idx_words, words in enumerate(decoding):
+            if words == '[UNK]':
+                decoding[idx_words] = sentence[count]
+                count += 1
+                continue
+            count += len(str(words))
+            # if word == '[':
+            #     if len(words) >= idx_word + 3:
+            #         if '[UNK]' in words[idx_words]:
+            #             words[idx_words][idx_word]
 
         return decoding
-
-        # count = 0
-        # for idx_words, words in enumerate(decoding):
-        #     for idx_word, word in enumerate(words):
-        #         c += 1
-        #         if word== '[':
-        #             if len(words)>= idx_word+ 3:
-        #                 if '[UNK]' in words[idx_words][idx_word:idx_word+3]:
 
     def get_ne(self, sentence):
         '''get named entity
@@ -118,26 +124,39 @@ class HealthNER:
         labels = self._get_model_output(sentence)
         decoding = self.get_decoding(sentence)
 
-        isEntity = False
-        for i in range(len(labels)):
-            if labels[i][0] == 'B':
-                if isEntity:
-                    end = i - 1
-                    entities.append(
+        # isEntity = False
+
+        begin_lst = [i for i, x in enumerate(labels) if x[0] == 'B']
+
+        for begin in begin_lst:
+            end = begin
+            while labels[end + 1][0] == 'I':
+                end += 1
+            entities.append(
                         {'word': ''.join(
-                            decoding[begin:end + 1]), 'type': labels[begin][2:], 'pos': (begin, end)}
+                            decoding[begin:end+ 1]), 'type': labels[begin][2:], 'pos': (begin, end)}
                     )
-                begin = i
-                isEntity = True
-            elif labels[i][0] == 'I':
-                end = i
-            elif isEntity:
-                entities.append(
-                    {'word': ''.join(
-                        decoding[begin:end + 1]), 'type': labels[begin][2:], 'pos': (begin, end)}
-                )
-                isEntity = False
+
+        # for i in range(len(labels)):
+        #     if labels[i][0] == 'B':
+        #         if isEntity:
+        #             end = i - 1
+        #             entities.append(
+        #                 {'word': ''.join(
+        #                     decoding[begin:end + 1]), 'type': labels[begin][2:], 'pos': (begin, end)}
+        #             )
+        #         begin = i
+        #         isEntity = True
+        #     elif labels[i][0] == 'I':
+        #         end = i
+        #     elif isEntity:
+        #         entities.append(
+        #             {'word': ''.join(
+        #                 decoding[begin:end + 1]), 'type': labels[begin][2:], 'pos': (begin, end)}
+        #         )
+        #         isEntity = False
         return entities
+
 
         # # %%
         # n = HealthNER(
@@ -145,21 +164,21 @@ class HealthNER:
         # # %%
         # print(n.get_ne(doc1))
 # %%
-# hner = HealthNER(
-#     r'D:\CodeRepositories\aiot2022\data\models\model_ner_adam_1e-06_2.pt')
-# # %%
+hner = HealthNER(
+    r'D:\CodeRepositories\aiot2022\data\models\model_ner_adam_1e-06_2.pt')
+# %%
 # sentence = '我媽媽查出有心臟病，還有早搏，醫生給他開了穩心顆粒和鹽酸美西律片，吃了以後就噁心，嘔吐，頭暈，手腳無力，還顫動，是怎麼回事，已經兩個多小時了，有危險嗎？，'
 # sentence = '眼底病變：當微細動脈硬化會導致動脈內腔變細，動脈內壁變厚，使微細動脈出血，視神經乳頭浮腫，造成患者視力逐漸減低。但患者大多是再出現視力模糊後，接受眼科醫師檢查時，才發現罹患高血壓疾病。'
-# # sentence = '懷孕53.天，有2.5次自然流產是不是正常'
-# sentence= '（五） 返家後若有發燒、腹痛厲害或嚴重嘔吐、腹瀉應立即返診。'
+# sentence = '懷孕53天，有25次自然流產是不是正常，有嘔吐，肚子痛'
+sentence= '（五） 返家後若有發燒、腹痛厲害或嚴重嘔吐、腹瀉應立即返診。'
 # # print(len(sentence))
 # # encoding = hner.tokenizer.encode(sentence, return_offsets_mapping=True,
 # #                                  padding='max_length',
 # #                                  truncation=True,
 # #                                  max_length=128,)
-# # print(encoding)
-# # print(hner.get_decoding(sentence))
-# # print(hner._get_model_output(sentence))
-# for symp in hner.get_ne(sentence):
-#     print(symp)
+# # # print(encoding)
+# print(hner.get_decoding(sentence))
+# print(hner._get_model_output(sentence))
+for symp in hner.get_ne(sentence):
+    print(symp)
 # %%
