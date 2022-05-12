@@ -61,10 +61,13 @@ with open('D:\\CodeRepositories\\aiot2022\\ie\\data\\dep.csv', 'a+') as saving_c
 '''
 '''
 # ** ner
-ner = HealthNER(model_path=nermodel_path)
-#%%
+hner = HealthNER(model_path=hnermodel_path)
+# %%
+
+
+# %%
 print(doc4)
-print(ner._get_model_output(doc4))
+print(hner._get_model_output(doc4))
 # %%
 '''
 蒐集症狀 entity

@@ -97,10 +97,12 @@ for filename in os.listdir(pdftxt_dir):
 
 # %% all e
 all_e_path = r'D:\CodeRepositories\aiot2022\data\emr\all_e.txt'
+print(all_e_path)
 
 with open(all_e_path, 'r', encoding='utf-8') as all_e:
     for para in all_e:
         isSymp = False
+        para = para.replace(' ', '')
         entities = hner.get_ne(para)
         if entities:
             for idx, entity in enumerate(entities):
@@ -119,4 +121,5 @@ with open(all_e_path, 'r', encoding='utf-8') as all_e:
                     else:
                         print(entity['word'])
                 print(seg[0], '\n')
-    break
+
+# %%

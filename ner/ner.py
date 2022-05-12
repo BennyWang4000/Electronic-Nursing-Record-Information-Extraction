@@ -36,7 +36,6 @@ class HealthNER:
         returns
             list<str>
         '''
-        sentence = sentence.replace(' ', '')
         sent_len = len(sentence)
         encoding = self.tokenizer(sentence,
                                   return_offsets_mapping=True,
@@ -65,7 +64,6 @@ class HealthNER:
         return
             list<str>
         '''
-        sentence = sentence.replace(' ', '')
         encoding = self.tokenizer.encode(sentence, return_offsets_mapping=True,
                                          padding='max_length',
                                          truncation=True,
@@ -94,7 +92,6 @@ class HealthNER:
             list<dict<>>, {'word': str, 'type': str, 'pos': (int, int)}
         '''
         entities = []
-        sentence = sentence.replace(' ', '')
         labels = self._get_model_output(sentence)
         decoding = self.get_decoding(sentence)
 
@@ -112,6 +109,60 @@ class HealthNER:
             )
 
         return entities
+
+    def ne_seg(self, sentence, ltp: LTP):
+        '''segment entity in ltp for dependency tree. required ltp
+        params
+            setence: str
+            ltp: ltp.LTP()
+        return
+            seg: list<str>
+            hidden: ?
+            ignore: list<ne>
+
+        '''
+        nes = self.get_ne(sentence)
+        seg, _ = ltp.seg([sentence])
+
+        for ne in nes:
+            # * ne_word = sentence[ne['pos'][0]:ne['pos'][1]]
+
+            # print(ltp.seg([para])[0])
+
+            if ne['word'] not in seg[0]:
+                isSet0 = False
+                isSet1 = False
+                count = 0
+                for idx_w, word in enumerate(seg[0]):
+                    for idx_c, word in enumerate(word):
+                        if (word == '@' and word[-1 if idx_c + 1 >= len(word) else idx_c + 1] == '@') or (word == '@' and word[idx_c - 1] == '@'):
+                            continue
+                        if count == ne['pos'][0] or count == ne['pos'][1]:
+                            if isSet0:
+                                seg[0][idx_w] = seg[0][idx_w][:idx_c + 2] + \
+                                    '@@' + seg[0][idx_w][idx_c + 2:]
+                                isSet1 = True
+                            else:
+                                seg[0][idx_w] = seg[0][idx_w][:idx_c] + \
+                                    '@@' + seg[0][idx_w][idx_c:]
+                                isSet0 = True
+                        count += 1
+                        if isSet1:
+                            break
+                    isSet0 = False
+
+        # print(seg[0])
+        seg_preseg = '@@'.join(seg[0])
+        seg_preseg = seg_preseg.replace('@@@@', '@@')
+
+        seg, hidden = ltp.seg([seg_preseg.split('@@')], is_preseged=True)
+
+        ignore = []
+        for ne in nes:
+            if ne['word'] not in seg[0]:
+                ignore.append(ne)
+
+        return seg[0], hidden, ignore
 
 # %%
 # hner = HealthNER(
