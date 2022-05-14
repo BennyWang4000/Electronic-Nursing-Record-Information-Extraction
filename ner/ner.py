@@ -3,9 +3,9 @@ import os
 import glob
 from ltp import LTP
 import sys
-if r'D:\CodeRepositories\aiot2022\Electronic-Nursing-Record-Information-Extraction\ner' not in sys.path:
-    sys.path.append(
-        r"D:\CodeRepositories\aiot2022\Electronic-Nursing-Record-Information-Extraction\ner")
+if '../../ner' not in sys.path:
+    sys.path.append('../../ner')
+
 from model.utils import ids_dict, label_dict
 import torch
 from transformers import BertTokenizerFast
