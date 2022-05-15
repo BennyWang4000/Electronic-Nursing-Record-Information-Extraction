@@ -17,5 +17,5 @@
 独立结构|IS|independent structure|两个单句在结构上彼此独立|
 核心关系|HED|head|指整个句子的核心|
 
-> **Table from 记忆星尘 CSDN 句法分析 ** \
-> link: https://blog.csdn.net/u014203254/article/details/104260551
+
+https://www.ltp-cloud.com/intro_en#srl_how

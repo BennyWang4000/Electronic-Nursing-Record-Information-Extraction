@@ -93,7 +93,7 @@ class HealthNER:
             list<dict<>>, {'word': str, 'type': str, 'pos': (int, int)}
 
         known issue
-            if named entity is at the last of sentence, it will retur empty string
+            if named entity is at the last or the first of sentence, it will retur empty string
             temporary solution: add 。 in sentence :(
         '''
         entities = []
@@ -142,6 +142,7 @@ class HealthNER:
             hidden: ?
             ignore: list<ne>
 
+        known issue: 
 
 
         '''
@@ -175,8 +176,11 @@ class HealthNER:
                 isSet0 = False
 
         seg_preseg = '@@'.join(seg[0])
-        seg_preseg = seg_preseg.replace('@@@@', '@@')
+        seg_preseg = seg_preseg.replace('@@@@@@@@@@@@', '@@')
+        seg_preseg = seg_preseg.replace('@@@@@@@@@@', '@@')
+        seg_preseg = seg_preseg.replace('@@@@@@@@', '@@')
         seg_preseg = seg_preseg.replace('@@@@@@', '@@')
+        seg_preseg = seg_preseg.replace('@@@@', '@@')
         seg, hidden = ltp.seg([seg_preseg.split('@@')], is_preseged=True)
 
         ignore = []
