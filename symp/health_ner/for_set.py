@@ -58,4 +58,5 @@ for type_name in type_lst:
     with open(os.path.join(saving_dir, type_name + '.txt'), 'r') as ori_txt, open(os.path.join(saving_dir, type_name + '_set.txt'), 'a+') as set_txt:
         word_set = set(line.strip() for line in ori_txt)
         for word in list(word_set):
-            set_txt.write(word+ '\n')
+            set_txt.write(word + '\n')
+# %%

@@ -84,12 +84,17 @@ class HealthNER:
 
         return decoding
 
-    def get_ne(self, sentence):
+    def get_ne(self, sentence, type=None):
         '''get named entity
         params
             sentence: str
+            type: list<str> label that you want
         return 
             list<dict<>>, {'word': str, 'type': str, 'pos': (int, int)}
+
+        known issue
+            if named entity is at the last of sentence, it will retur empty string
+            temporary solution: add 。 in sentence :(
         '''
         entities = []
         labels = self._get_model_output(sentence)
@@ -108,7 +113,24 @@ class HealthNER:
                     decoding[begin:end + 1 if end + 1 < len(labels) else -1]), 'type': labels[begin][2:], 'pos': (begin, end + 1 if end + 1 < len(labels) else -1)}
             )
 
+        if type:
+            for ne in entities:
+                if ne['type'] not in type:
+                    entities.remove(ne)
+
         return entities
+
+    def get_ne_idx(self, sent_lst, ne_lst, ignore=None):
+        pos_lst = []
+        ne_idx = 0
+        for idx, word in enumerate(sent_lst):
+            if ne_lst[ne_idx]['word'] in word:
+                pos_lst.append(idx)
+                ne_idx += 1
+                if ne_idx >= len(ne_lst):
+                    break
+
+        return pos_lst
 
     def ne_seg(self, sentence, ltp: LTP):
         '''segment entity in ltp for dependency tree. required ltp
@@ -120,41 +142,41 @@ class HealthNER:
             hidden: ?
             ignore: list<ne>
 
+
+
         '''
         nes = self.get_ne(sentence)
         seg, _ = ltp.seg([sentence])
 
         for ne in nes:
             # * ne_word = sentence[ne['pos'][0]:ne['pos'][1]]
+            # if ne['word'] not in seg[0]:
+            isSet0 = False
+            isSet1 = False
+            count = 0
+            for idx_w, word in enumerate(seg[0]):
 
-            # print(ltp.seg([para])[0])
-
-            if ne['word'] not in seg[0]:
                 isSet0 = False
-                isSet1 = False
-                count = 0
-                for idx_w, word in enumerate(seg[0]):
-                    for idx_c, word in enumerate(word):
-                        if (word == '@' and word[-1 if idx_c + 1 >= len(word) else idx_c + 1] == '@') or (word == '@' and word[idx_c - 1] == '@'):
-                            continue
-                        if count == ne['pos'][0] or count == ne['pos'][1]:
-                            if isSet0:
-                                seg[0][idx_w] = seg[0][idx_w][:idx_c + 2] + \
-                                    '@@' + seg[0][idx_w][idx_c + 2:]
-                                isSet1 = True
-                            else:
-                                seg[0][idx_w] = seg[0][idx_w][:idx_c] + \
-                                    '@@' + seg[0][idx_w][idx_c:]
-                                isSet0 = True
-                        count += 1
-                        if isSet1:
-                            break
-                    isSet0 = False
+                for idx_c, word in enumerate(word):
+                    if (word == '@' and word[-1 if idx_c + 1 >= len(word) else idx_c + 1] == '@') or (word == '@' and word[idx_c - 1] == '@'):
+                        continue
+                    if count == ne['pos'][0] or count == ne['pos'][1]:
+                        if isSet0:
+                            seg[0][idx_w] = seg[0][idx_w][:idx_c + 2] + \
+                                '@@' + seg[0][idx_w][idx_c + 2:]
+                            isSet1 = True
+                        else:
+                            seg[0][idx_w] = seg[0][idx_w][:idx_c] + \
+                                '@@' + seg[0][idx_w][idx_c:]
+                            isSet0 = True
+                    count += 1
+                    if isSet1:
+                        break
+                isSet0 = False
 
-        # print(seg[0])
         seg_preseg = '@@'.join(seg[0])
         seg_preseg = seg_preseg.replace('@@@@', '@@')
-
+        seg_preseg = seg_preseg.replace('@@@@@@', '@@')
         seg, hidden = ltp.seg([seg_preseg.split('@@')], is_preseged=True)
 
         ignore = []
@@ -162,12 +184,38 @@ class HealthNER:
             if ne['word'] not in seg[0]:
                 ignore.append(ne)
 
-        return seg[0], hidden, ignore
+        return seg, hidden, ignore
 
-# %%
+
+# # %%
 # hner = HealthNER(
 #     r'D:\CodeRepositories\aiot2022\data\models\model_ner_adam_1e-06_2.pt')
 # # %%
+# ltp = LTP()
+# # %%
+# content = '我痛在背部，背部很痛。'
+
+# ne_lst = []
+
+# nes = hner.get_ne(content, type=['BODY', 'DISE', 'SYMP'])
+# seg, hidden = ltp.seg([content])
+# print(seg)
+# seg, hidden, _ = hner.ne_seg(content, ltp)
+# # print(seg)
+# print(seg)
+# nes = hner.get_ne(content)
+# for ne in nes:
+#     print(ne)
+
+# ne_pos_lst = hner.get_ne_idx(seg[0], nes)
+
+# dep = ltp.dep(hidden)
+# for i in range(len(seg[0])):
+#     print(seg[0][i], dep[0][i])
+# print()
+
+
+# %%
 # # sentence = '我媽媽查出有心臟病，還有早搏，醫生給他開了穩心顆粒和鹽酸美西律片，吃了以後就噁心，嘔吐，頭暈，手腳無力，還顫動，是怎麼回事，已經兩個多小時了，有危險嗎？，'
 # # sentence = '眼底病變：當微細動脈硬化會導致動脈內腔變細，動脈內壁變厚，使微細動脈出血，視神經乳頭浮腫，造成患者視力逐漸減低。但患者大多是再出現視力模糊後，接受眼科醫師檢查時，才發現罹患高血壓疾病。'
 # # sentence = '懷孕53天，有25次自然流產是不是正常，有嘔吐，肚子痛'
