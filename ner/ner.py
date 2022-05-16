@@ -195,43 +195,48 @@ class HealthNER:
 # hner = HealthNER(
 #     r'D:\CodeRepositories\aiot2022\data\models\model_ner_adam_1e-06_2.pt')
 # # %%
-# ltp = LTP()
-# # %%
-# content = '我痛在背部，背部很痛。'
+# with open(r'D:\CodeRepositories\aiot2022\data\vghks\pdftxt_clean\7A10023.txt', 'r', encoding='utf-8') as file:
+#     for para in file.readlines():
+#         para= para.replace(' ', '').replace('.', '')
 
-# ne_lst = []
+#         print(para)
+# #%%
+    # ltp = LTP()
+    # # %%
+    # content = '我痛在背部，背部很痛。'
 
-# nes = hner.get_ne(content, type=['BODY', 'DISE', 'SYMP'])
-# seg, hidden = ltp.seg([content])
-# print(seg)
-# seg, hidden, _ = hner.ne_seg(content, ltp)
-# # print(seg)
-# print(seg)
-# nes = hner.get_ne(content)
-# for ne in nes:
-#     print(ne)
+    # ne_lst = []
 
-# ne_pos_lst = hner.get_ne_idx(seg[0], nes)
+    # nes = hner.get_ne(content, type=['BODY', 'DISE', 'SYMP'])
+    # seg, hidden = ltp.seg([content])
+    # print(seg)
+    # seg, hidden, _ = hner.ne_seg(content, ltp)
+    # # print(seg)
+    # print(seg)
+    # nes = hner.get_ne(content)
+    # for ne in nes:
+    #     print(ne)
 
-# dep = ltp.dep(hidden)
-# for i in range(len(seg[0])):
-#     print(seg[0][i], dep[0][i])
-# print()
+    # ne_pos_lst = hner.get_ne_idx(seg[0], nes)
 
+    # dep = ltp.dep(hidden)
+    # for i in range(len(seg[0])):
+    #     print(seg[0][i], dep[0][i])
+    # print()
 
-# %%
-# # sentence = '我媽媽查出有心臟病，還有早搏，醫生給他開了穩心顆粒和鹽酸美西律片，吃了以後就噁心，嘔吐，頭暈，手腳無力，還顫動，是怎麼回事，已經兩個多小時了，有危險嗎？，'
-# # sentence = '眼底病變：當微細動脈硬化會導致動脈內腔變細，動脈內壁變厚，使微細動脈出血，視神經乳頭浮腫，造成患者視力逐漸減低。但患者大多是再出現視力模糊後，接受眼科醫師檢查時，才發現罹患高血壓疾病。'
-# # sentence = '懷孕53天，有25次自然流產是不是正常，有嘔吐，肚子痛'
-# sentence= ' （五） 返家後若有發燒、腹痛厲害或嚴重嘔吐、腹瀉應立即返診。'
-# # # print(len(sentence))
-# # # encoding = hner.tokenizer.encode(sentence, return_offsets_mapping=True,
-# # #                                  padding='max_length',
-# # #                                  truncation=True,
-# # #                                  max_length=128,)
-# # # # print(encoding)
-# # print(hner.get_decoding(sentence))
-# # print(hner._get_model_output(sentence))
-# for symp in hner.get_ne(sentence):
-#     print(symp)
-# %%
+    # %%
+    # # sentence = '我媽媽查出有心臟病，還有早搏，醫生給他開了穩心顆粒和鹽酸美西律片，吃了以後就噁心，嘔吐，頭暈，手腳無力，還顫動，是怎麼回事，已經兩個多小時了，有危險嗎？，'
+    # # sentence = '眼底病變：當微細動脈硬化會導致動脈內腔變細，動脈內壁變厚，使微細動脈出血，視神經乳頭浮腫，造成患者視力逐漸減低。但患者大多是再出現視力模糊後，接受眼科醫師檢查時，才發現罹患高血壓疾病。'
+    # # sentence = '懷孕53天，有25次自然流產是不是正常，有嘔吐，肚子痛'
+    # sentence= ' （五） 返家後若有發燒、腹痛厲害或嚴重嘔吐、腹瀉應立即返診。'
+    # # # print(len(sentence))
+    # # # encoding = hner.tokenizer.encode(sentence, return_offsets_mapping=True,
+    # # #                                  padding='max_length',
+    # # #                                  truncation=True,
+    # # #                                  max_length=128,)
+    # # # # print(encoding)
+    # # print(hner.get_decoding(sentence))
+    # # print(hner._get_model_output(sentence))
+    # for symp in hner.get_ne(sentence):
+    #     print(symp)
+    # %%

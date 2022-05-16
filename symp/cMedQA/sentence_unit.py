@@ -27,7 +27,7 @@ class SentenceUnit:
                 idx=dep_lst[i][0] - 1,
                 dep_idx=dep_lst[i][1] - 1,
                 dep_type=dep_lst[i][2],
-                sdp_idx=sdp_lst[i][1]- 1,
+                sdp_idx=sdp_lst[i][1] - 1,
                 sdp_type=sdp_lst[i][2]))
 
     def get_word_by_idx(self, idx) -> WordUnit:
@@ -42,3 +42,18 @@ class SentenceUnit:
     def print_words(self):
         for word in self.words:
             word.print_word()
+
+    def get_depend(self, idx, dep_type):
+        assert dep_type in ['sdp', 'dep']
+
+        dp_lst = []
+        if dep_type == 'sdp':
+            for word in self.words:
+                if word.sdp_idx == idx:
+                    dp_lst.append(word)
+        else:
+            for word in self.words:
+                if word.dep_idx == idx:
+                    dp_lst.append(word)
+
+        return dp_lst
